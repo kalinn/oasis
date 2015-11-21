@@ -23,7 +23,8 @@ Depends:
     oro.nifti,
 Imports:
     stats,
-    parallel
+    parallel,
+    methods
 License: GPL-2
 LazyLoad: yes
 LazyData: yes
