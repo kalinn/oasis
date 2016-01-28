@@ -43,8 +43,6 @@
 #' @export 
 oasis_predict <- function(flair, ##flair volume of class nifti
                           t1, ##t1 volume of class nifti
-                          t2, ##t2 volume of class nifti
-                          pd, ##pd volume of class nifti
                           brain_mask = NULL, ##brain mask of class nifti
                           preproc = FALSE, ##option to preprocess the data
                           normalize = TRUE, ##option to normalize 
@@ -56,27 +54,23 @@ oasis_predict <- function(flair, ##flair volume of class nifti
 ) {
   flair = check_nifti(flair)
   t1 = check_nifti(t1)
-  t2 = check_nifti(t2)
-  pd = check_nifti(pd)
   
   ##correct image dimmension
   flair <- correct_image_dim(flair)
   t1 <- correct_image_dim(t1)
-  t2 <- correct_image_dim(t2)
-  pd <- correct_image_dim(pd)
   
   
   ##image preproceesing 
   if (preproc == TRUE) {
     ## the image preproceesing 
-    preprocess <- oasis_preproc(flair = flair, t1 = t1, t2 = t2, pd = pd, 
+    preprocess <- oasis_preproc(flair = flair, t1 = t1, 
                                 cores = cores,
                                 brain_mask = brain_mask)
-    oasis_study <- preprocess[c("flair","t1", "t2", "pd")]
+    oasis_study <- preprocess[c("flair","t1")]
     brain_mask <- preprocess$brain_mask
   } else{
     ## no preprocessing  
-    oasis_study <- list(flair = flair, t1 = t1, t2 = t2, pd = pd)
+    oasis_study <- list(flair = flair, t1 = t1)
   }
   if (is.null(brain_mask) & !preproc){
     ## create a brain mask if not supplied
@@ -132,7 +126,7 @@ oasis_predict <- function(flair, ##flair volume of class nifti
   oasis_study <- lapply(oasis_study, function(x) x[top_voxels == 1])
   oasis_dataframe <- do.call(cbind.data.frame, oasis_study)
   
-  names <- c("FLAIR", "T1", "T2", "PD")
+  names <- c("FLAIR", "T1")
   colnames(oasis_dataframe) <-  c(names, 
                                   paste0(names, "_10"),  
                                   paste0(names, "_20"))
@@ -165,15 +159,13 @@ oasis_predict <- function(flair, ##flair volume of class nifti
   }
   if (return_preproc == TRUE & binary == FALSE) {
     return(list(oasis_map = prob_map, flair = flair, 
-                t1 = t1, t2 = t2,
-                pd = pd, brain_mask = brain_mask, 
+                t1 = t1, brain_mask = brain_mask, 
                 voxel_selection = top_voxels,
                 unsmoothed_map = predictions_nifti))
   } 
   if (return_preproc == TRUE & binary == TRUE) {
     return(list(oasis_map = prob_map, flair = flair, 
-                t1 = t1, t2 = t2,
-                pd = pd, brain_mask = brain_mask, 
+                t1 = t1, brain_mask = brain_mask, 
                 voxel_selection = top_voxels, 
                 binary_map = binary_map,
                 unsmoothed_map = predictions_nifti))

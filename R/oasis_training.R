@@ -24,8 +24,7 @@ oasis_training <- function(..., ##dataframes from function
   train_vectors_multi <- as.data.frame(train_vectors_multi)
   ##fit the oasis model 
   oasis_model <- glm(formula = GoldStandard ~ FLAIR_10 *FLAIR  +
-                      FLAIR_20*FLAIR + PD_10 *PD  + PD_20 *PD +
-                      T2_10 *T2 +  T2_20 *T2 + T1_10 *T1 +
+                      FLAIR_20*FLAIR + T1_10 *T1 +
                       T1_20 *T1, 
                      data = train_vectors_multi, 
                      family = binomial)

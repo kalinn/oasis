@@ -36,8 +36,6 @@
 #' @export
 oasis_train_dataframe <- function(flair, ##flair volume of class nifti
                           t1, ##t1 volume of class nifti
-                          t2, ##t2 volume of class nifti
-                          pd, ##pd volume of class nifti
                           gold_standard, ##gold standard mask of class nifti
                           brain_mask = NULL, ##brain mask of class nifti
                           preproc = FALSE, ##option to preprocess the data
@@ -51,25 +49,21 @@ oasis_train_dataframe <- function(flair, ##flair volume of class nifti
   
   flair = check_nifti(flair)
   t1 = check_nifti(t1)
-  t2 = check_nifti(t2)
-  pd = check_nifti(pd)
   
   ##correct image dimmension
   flair <- correct_image_dim(flair)
   t1 <- correct_image_dim(t1)
-  t2 <- correct_image_dim(t2)
-  pd <- correct_image_dim(pd)
   
   ##image preproceesing 
   if(preproc == TRUE){
     ## the image preproceesing 
     preprocess <- oasis_preproc(flair = flair, t1 = t1, 
-                                t2 = t2, pd = pd, cores = cores)
-    oasis_study <- preprocess[c("flair","t1", "t2", "pd")]
-    brain_mask <- preprocess[[5]]
+                                cores = cores)
+    oasis_study <- preprocess[c("flair","t1")]
+    brain_mask <- preprocess[[3]]
   } else{
     ## no preprocessing  
-    oasis_study <- list(flair = flair, t1 = t1, t2 = t2, pd = pd)
+    oasis_study <- list(flair = flair, t1 = t1)
   }
   if (is.null(brain_mask) & !preproc){
     ## create a brain mask if not supplied
@@ -95,7 +89,7 @@ oasis_train_dataframe <- function(flair, ##flair volume of class nifti
                                 cutoff = .85)
   
   orig_study = oasis_study
-  names(orig_study) <- c("FLAIR", "T1", "T2", "PD")
+  names(orig_study) <- c("FLAIR", "T1")
   
   ## smooth the images using fslsmooth from the fslr package 
   smooth <- mclapply(orig_study, fslsmooth,
@@ -144,7 +138,7 @@ oasis_train_dataframe <- function(flair, ##flair volume of class nifti
   
   if(return_preproc == TRUE){
     return(list(oasis_dataframe = oasis_dataframe, flair = flair, 
-      t1 = t1, t2 = t2, pd = pd, 
+      t1 = t1,
       brain_mask = brain_mask, voxel_selection = top_voxels))
   } else{
     return(oasis_dataframe)

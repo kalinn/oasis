@@ -27,15 +27,13 @@
 #' @export 
 oasis_preproc <- function(flair, #flair volume of class nifti
                           t1, # t1 volume of class nifti
-                          t2, # t2 volume of class nifti
-                          pd, # pd volume of class nifti
                           brain_mask = NULL,
                           verbose = TRUE,
                           cores = 1
 ){
   
   
-  study <- list(flair = flair, t1 = t1, t2 = t2, pd = pd)
+  study <- list(flair = flair, t1 = t1)
   # study = check_nifti(study)
   
   if (verbose) {
@@ -43,8 +41,8 @@ oasis_preproc <- function(flair, #flair volume of class nifti
   } 
   
   ##rigidly register to the flair, t2, and pd to the t1 using fsl flirt 
-  study[c("flair","t2", "pd")] <- mclapply(
-    study[c("flair","t2", "pd")], function(x)  {
+  study[c("flair")] <- mclapply(
+    study[c("flair")], function(x)  {
     tfile = tempfile(fileext = ".mat")
     flirt(infile = x, omat = tfile,
           reffile = study$t1, 
